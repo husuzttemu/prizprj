@@ -5,6 +5,7 @@ from search_engine.engine import Engine
 
 from locators import page_locators
 
+import re
 #print(pagecontent)
 
 #test
@@ -42,10 +43,11 @@ def parse_products(e):
 #find_pages('https://www.sanalmarket.com.tr/arama?q=komili')
 
 
-
 myEngine = Engine()
 #print(myEngine.__doc__)
 myEngine.find_products_from_all_categories()
+#myEngine.find_pages_from_categories("https://www.sanalmarket.com.tr/gunes-bakim-c-94")
+
 
 #myEngine.find_pages('https://www.sanalmarket.com.tr/arama?q=komili')
 
@@ -62,3 +64,10 @@ myEngine.find_products_from_all_categories()
 
 
 
+"""
+mylist = '''<li class="active"><a data-page="1">
+        1 <span class="sr-only">(current)</span></a></li>, <li class=""><a data-page="2">
+        2 <span class="sr-only">(current)</span></a></li>, <li class=""><a data-page="3">
+        3 <span class="sr-only">(current)</span></a></li>, <li>...</li>, <li><a data-page="14"> 14</a></li>, <li class="pag-next"><a aria-label="Next" data-page="2"><i class="icon page-r-arrow"></i></a></li>'''
+"""
+#print(mylist)

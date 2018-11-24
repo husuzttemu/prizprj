@@ -1,8 +1,11 @@
 
 import requests
+
 from bs4 import BeautifulSoup
 from locators.page_locators import PageLocators
 from parsers.product_parser import ProductParser
+
+import time
 
 class Engine:
     """
@@ -30,25 +33,20 @@ class Engine:
         return
 
     def find_product_list(self,page):
-        #print("a")
+
         pagecontent = requests.get(page).content
-        #print("b")
-        simple_soup = BeautifulSoup(pagecontent, "html.parser")
-        #print("c")
+        try:
+            simple_soup = BeautifulSoup(pagecontent, "html.parser")
+        except:
+            raise
+
         selector = PageLocators.PRODUCTSELECTOR
-        #print(f"d: {PageLocators.PRODUCTSELECTOR}")
         list_id_products = simple_soup.select(selector)
-        #print(f"e:{list_id_products}")
-        # print(list_id_products)
-        # selector = 'input'
-        # list_contents = [e for e in list_id_products]
-        # print(list_contents)
-        for e in list_id_products:
-            print(f" x:{e}")
-            x = ProductParser(e)
-            print(x)
-            self.products.append(x.getProduct)
-            print(f'ürün : {self.products}')
+
+        if list_id_products:
+            for e in list_id_products:
+                x = ProductParser(e)
+                self.products.append(x.getProduct)
 
     def find_pages(self,link):
         pagecontent = requests.get(link).content
@@ -57,30 +55,41 @@ class Engine:
         pages = simple_soup.select(selector)
         page_list = list(set([e.select_one('a').attrs['href'] for e in pages]))
 
-        for page in page_list:
-            print(f' ürün page  = https://www.sanalmarket.com.tr/arama{page}')
-            self.find_product_list(f'https://www.sanalmarket.com.tr/arama{page}')
+        if page_list:
+            for page in page_list:
+                print(f' ürün page  = https://www.sanalmarket.com.tr/arama{page}')
+                self.find_product_list(f'https://www.sanalmarket.com.tr/arama{page}')
 
     def find_products_from_all_categories(self):
         pagecontent = requests.get('https://www.sanalmarket.com.tr/').content
         simple_soup = BeautifulSoup(pagecontent, "html.parser")
         selector = PageLocators.SEARCHALLPRODUCTSBYCATEGORIESSELECTOR
         pages = [e.select_one('a').attrs['href'] for e in simple_soup.select(selector)]
-        # print(pages)
-        for page in pages:
-            print(f' category page  = https://www.sanalmarket.com.tr{page}')
-            # find_product_list(f'https://www.sanalmarket.com.tr/{page}')
-            self.find_pages_from_categories(f'https://www.sanalmarket.com.tr{page}')
+        if pages:
+            for page in pages:
+                print(f' category page  = https://www.sanalmarket.com.tr{page}')
+                # find_product_list(f'https://www.sanalmarket.com.tr/{page}')
+                self.find_pages_from_categories(f'https://www.sanalmarket.com.tr{page}')
+                #sleep 8 sec between each categories...
+                time.sleep(8)
+        else:
+            print("There is no category")
 
     def find_pages_from_categories(self,link):
         pagecontent = requests.get(link).content
         simple_soup = BeautifulSoup(pagecontent, "html.parser")
+
         selector = 'div.row div.text-center nav.page-nav ul.pagination li'  # PageLocators.SEARCHENGINESELECTOR
         pages = simple_soup.select(selector)
-        # print(f'pages : {pages}')
-        page_list = list(set([e.select_one('a').attrs['data-page'] for e in pages]))
-        print(f'pagex : {page_list}')
 
-        for page in page_list:
-            print(f' ürün page  = {link}?sayfa={page}')
-            self.find_product_list(f'{link}?sayfa={page}')
+
+        page_list = list(set([int(e.select_one('a').attrs['data-page'])
+                                  for e in pages if e.select_one('a') is not None
+                                  ]))
+        if page_list:
+            a = int(max(page_list))
+            #print(f'link : {link} pagex5 : {a}')
+            for page in range(1,max(page_list)+1):
+                #print(f' ürün page  = {link}?sayfa={findpage}')
+                self.find_product_list(f'{link}?sayfa={page}')
+
