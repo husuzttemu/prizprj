@@ -81,7 +81,7 @@ class ProductParser:
         return promotionPrice
 
     def _insert_data(self):
-        client = MongoClient('localhost', 5500)
+        client = MongoClient('localhost', 27017)
         db = client.shop
         db.products.insert_one(self.product)
 
