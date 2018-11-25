@@ -1,5 +1,7 @@
 from locators.page_locators import PageLocators
 from pymongo import MongoClient
+import datetime
+from pymongo.errors import ConnectionFailure
 
 class ProductParser:
     '''
@@ -24,11 +26,11 @@ class ProductParser:
         self.product['barcode']=self.productBarcode
         self.product['name']=self.productName
         self.product['price']=self.productPrice
+        self.product['insertDatetime']=datetime.datetime.now()
 
     @property
     def getProduct(self):
         return self.product
-
 
     @property
     def productBarcode(self):
@@ -81,9 +83,12 @@ class ProductParser:
         return promotionPrice
 
     def _insert_data(self):
-        client = MongoClient('localhost', 5500)
-        db = client.shop
-        db.products.insert_one(self.product)
+        try:
+            client = MongoClient('localhost', 27017)
+            db = client.shop
+            db.products.insert_one(self.product)
+        except ConnectionFailure:
+            print("Server is not available")
 
 
 
