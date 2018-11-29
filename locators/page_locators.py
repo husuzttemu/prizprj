@@ -11,4 +11,5 @@ class PageLocators:
     PRODUCTATTR='form.basket-process'
     PRODUCTMONITOR='form.basket-process figure a.product-link'
 
-    PROMOTIONPRICE='form.basket-process div.price-tag span.value'
+#    PROMOTIONPRICE='form.basket-process div.price-tag span.value'
+    PROMOTIONPRICE='form.basket-process div.campaign-tag span.value'

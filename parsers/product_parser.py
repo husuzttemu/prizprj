@@ -23,9 +23,11 @@ class ProductParser:
         return f' str id={self.productBarcode} name={self.productName} price={self.productPrice}'
 
     def setProduct(self):
+        self.product['category']=self.productCategoryName
         self.product['barcode']=self.productBarcode
         self.product['name']=self.productName
         self.product['price']=self.productPrice
+        self.product['promo_price'] = self.productPromotionPrice
         self.product['insertDatetime']=datetime.datetime.now()
 
     @property
@@ -78,8 +80,12 @@ class ProductParser:
 
     @property
     def productPromotionPrice(self):
-        text = self.parent.select_one(PageLocators.PROMOTIONPRICE)
-        promotionPrice = text.string.strip()
+        if self.parent.select_one(PageLocators.PROMOTIONPRICE) is None:
+            promotionPrice = 0
+        else:
+            text = self.parent.select_one(PageLocators.PROMOTIONPRICE)
+            promotionPrice = text.string.strip()
+#        promotionPrice = text.attrs['value']
         return promotionPrice
 
     def _insert_data(self):
